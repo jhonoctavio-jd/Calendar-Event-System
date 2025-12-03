@@ -1,207 +1,173 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
+import datetime
 
-# C extensions
-*.so
+USER = "admin"
+PASS = "1234"
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+events = {}
+event_no = 1
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+# Validate datetime format
+def valid_dt(dt):
+    try:
+        datetime.datetime.strptime(dt, "%m/%d/%Y %H-%M-%S")
+        return True
+    except:
+        return False
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# LOGIN FUNCTION
+def login():
+    while True:
+        print("===== CALENDAR EVENT SYSTEM ====")
+        print("============ LOGIN =============")
+        username = input("Username: ")
+        password = input("Password: ")
+        if username == USER and password == PASS:
+            print("\nLogged in successfully!\n")
+            break
+        else:
+            print("\nUsername or Password is Incorrect!\n")
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
+# INITIAL LOGIN
+login()
 
-# Translations
-*.mo
-*.pot
+# MENU LOOP
+while True:
+    print("==== MENU ====")
+    print("1. Add Event")
+    print("2. View Events")
+    print("3. Edit Event")
+    print("4. Delete Event")
+    print("5. Log Out")
+    print("6. Exit")
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+    choice = input("\nChoice: ")
 
-# Flask stuff:
-instance/
-.webassets-cache
+    # ADD EVENT
+    if choice == "1":
+        print("\n==== Add Event ====")
+        title = input("Enter Event Title: ")
 
-# Scrapy stuff:
-.scrapy
+        # DATE LOOP WITH FUTURE DATE CHECK
+        while True:
+            dt = input("Enter Event Date & Time (MM/DD/YYYY HH-MM-SS): ")
+            if not valid_dt(dt):
+                print("\nDate & Time Format is Incorrect! Try again.\n")
+                continue
+            event_time = datetime.datetime.strptime(dt, "%m/%d/%Y %H-%M-%S")
+            if event_time <= datetime.datetime.now():
+                print("\nDate & Time cannot be in the past! Enter a future date.\n")
+                continue
+            break
 
-# Sphinx documentation
-docs/_build/
+        people = input("Enter People in this Event: ")
+        description = input("Enter Event Description: ")
 
-# PyBuilder
-.pybuilder/
-target/
+        events[event_no] = {
+            "title": title,
+            "datetime": dt,
+            "people": people,
+            "description": description
+        }
+        event_no += 1
+        print("\nEvent Added Successfully!\n")
 
-# Jupyter Notebook
-.ipynb_checkpoints
+    # VIEW EVENTS
+    elif choice == "2":
+        if not events:
+            print("\nNo events.\n")
+            continue
 
-# IPython
-profile_default/
-ipython_config.py
+        print("\n==== View Events ====\n")
+        for n, e in events.items():
+            print(f"Event #{n}")
+            print(f"Title: {e['title']}")
+            print(f"Date & Time: {e['datetime']}")
+            print(f"People: {e['people']}")
+            print(f"Description: {e['description']}\n")
 
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
+    # EDIT EVENT
+    elif choice == "3":
+        if not events:
+            print("\nNo events to edit.\n")
+            continue
+        while True:
+            print("\n==== EDIT EVENT ====")
+            for n, e in events.items():
+                print(f"\nEvent #{n}")
+                print(f"Title: {e['title']}")
+                print(f"Date & Time: {e['datetime']}")
+                print(f"People: {e['people']}")
+                print(f"Description: {e['description']}")
+            event_number = input("\nEnter Event # to Edit: ")
+            if event_number.isdigit() and int(event_number) in events:
+                event_number = int(event_number)
+                e = events[event_number]
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+                e["title"] = input("New Event Title: ")
 
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
+                # NEW DATE LOOP WITH FUTURE CHECK
+                while True:
+                    new_dt = input("New Date & Time (MM/DD/YYYY HH-MM-SS): ")
+                    if not valid_dt(new_dt):
+                        print("Date & Time Format is Incorrect! Try again.\n")
+                        continue
+                    new_time = datetime.datetime.strptime(new_dt, "%m/%d/%Y %H-%M-%S")
+                    if new_time <= datetime.datetime.now():
+                        print("Date & Time cannot be in the past! Enter a future date.\n")
+                        continue
+                    e["datetime"] = new_dt
+                    break
 
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-#poetry.toml
+                e["people"] = input("Enter New People in this Event: ")
+                e["description"] = input("Enter New Event Description: ")
 
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
-#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
-#pdm.lock
-#pdm.toml
-.pdm-python
-.pdm-build/
+                print(f"\nEvent #{event_number} Updated Successfully!\n")
+                break
+            else:
+                print("\nEvent # doesn't exist. Try again.\n")
 
-# pixi
-#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
-#pixi.lock
-#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
-#   in the .venv directory. It is recommended not to include this directory in version control.
-.pixi
+    # DELETE EVENT
+    elif choice == "4":
+        if not events:
+            print("\nNo events to delete.\n")
+            continue
+        while True:
+            print("\n==== DELETE EVENT ====")
+            for n, e in events.items():
+                print(f"\nEvent #{n}")
+                print(f"Title: {e['title']}")
+                print(f"Date & Time: {e['datetime']}")
+                print(f"People: {e['people']}")
+                print(f"Description: {e['description']}")
+            event_number = input("\nEnter Event # to Delete: ")
+            if event_number.isdigit() and int(event_number) in events:
+                event_number = int(event_number)
+                break
+            print("\nEvent # doesn't exist. Try Again.\n")
+        confirm = input("Delete event? Yes or No: ").lower()
+        if confirm == "yes":
+            del events[event_number]
+            print("\nEvent Deleted Successfully!\n")
+            # REORDER EVENTS
+            new_events = {}
+            new_num = 1
+            for key in sorted(events.keys()):
+                new_events[new_num] = events[key]
+                new_num += 1
+            events = new_events
+            event_no = new_num
+        else:
+            print("\nEvent Deletion Cancelled.\n")
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
+    # LOG OUT
+    elif choice == "5":
+        print("\nLogging out...\n")
+        login()
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+    # EXIT
+    elif choice == "6":
+        print("\n===== Goodbye! =====\n")
+        break
 
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
-
-# Abstra
-# Abstra is an AI-powered process automation framework.
-# Ignore directories containing user credentials, local state, and settings.
-# Learn more at https://abstra.io/docs
-.abstra/
-
-# Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#  you could uncomment the following to ignore the entire vscode folder
-# .vscode/
-
-# Ruff stuff:
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
-
-# Cursor
-#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
-.cursorignore
-.cursorindexingignore
-
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
+    else:
+        print("\nInvalid Input.\n")
